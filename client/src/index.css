@@ -7,7 +7,7 @@
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background: #f5f7fb;
+  background: #f3f6fb;
   color: #17202e;
 }
 
@@ -31,15 +31,15 @@ a {
 
 @layer components {
   .page-shell {
-    @apply mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-6 sm:px-6 lg:gap-6 lg:px-8;
+    @apply mx-auto flex w-full max-w-[1460px] flex-col gap-5 px-4 py-5 sm:px-6 lg:gap-6 lg:px-8;
   }
 
   .panel {
-    @apply rounded-lg border border-ink-100 bg-white shadow-soft;
+    @apply rounded-xl border border-ink-100/90 bg-white shadow-card;
   }
 
   .input {
-    @apply h-10 w-full rounded-md border border-ink-100 bg-white px-3 py-2 text-sm text-ink-900 shadow-sm outline-none transition placeholder:text-ink-400 hover:border-ink-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400;
+    @apply h-11 w-full rounded-lg border border-ink-100 bg-white px-3 py-2 text-sm text-ink-900 shadow-sm outline-none transition placeholder:text-ink-400 hover:border-ink-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400;
   }
 
   .label {
@@ -47,15 +47,15 @@ a {
   }
 
   .btn {
-    @apply inline-flex h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:border-ink-100 disabled:bg-ink-100 disabled:text-ink-400 disabled:shadow-none;
+    @apply inline-flex h-11 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold shadow-sm transition focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:border-ink-100 disabled:bg-ink-100 disabled:text-ink-400 disabled:shadow-none;
   }
 
   .btn-sm {
-    @apply h-9 px-3 text-sm;
+    @apply h-9 rounded-md px-3 text-sm;
   }
 
   .btn-primary {
-    @apply border border-brand-700 bg-brand-700 text-white hover:border-brand-900 hover:bg-brand-900 focus:ring-brand-100;
+    @apply border border-brand-700 bg-brand-700 text-white shadow-brand-900/15 hover:border-brand-600 hover:bg-brand-600 focus:ring-brand-100;
   }
 
   .btn-secondary {
@@ -67,15 +67,53 @@ a {
   }
 
   .filter-toolbar {
-    @apply rounded-lg border border-ink-100 bg-white p-4 shadow-soft sm:p-5;
+    @apply rounded-xl border border-ink-100/90 bg-white p-4 shadow-card sm:p-5;
   }
 
   .alert-error {
-    @apply rounded-md border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700;
+    @apply rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700;
   }
 
   .alert-success {
-    @apply rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700;
+    @apply rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700;
+  }
+
+  .property-hero-image {
+    position: relative;
+    min-height: 190px;
+    overflow: hidden;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.55) 26%, rgba(255, 255, 255, 0.08) 58%),
+      linear-gradient(135deg, #f7fbff 0%, #dce8f4 45%, #b8cadd 100%);
+  }
+
+  .property-hero-image::before {
+    content: "";
+    position: absolute;
+    inset: 16px 0 0 auto;
+    width: 88%;
+    border-radius: 18px 0 0 18px;
+    background:
+      linear-gradient(90deg, rgba(255, 255, 255, 0.55) 0 2px, transparent 2px 54px) 0 0 / 56px 100%,
+      linear-gradient(180deg, rgba(15, 23, 42, 0.12) 0 2px, transparent 2px 46px) 0 0 / 100% 48px,
+      linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(214, 226, 239, 0.88));
+    box-shadow: inset 26px 0 48px rgba(255, 255, 255, 0.6), 0 18px 48px rgba(15, 23, 42, 0.12);
+    transform: skewX(-9deg) translateX(24px);
+    transform-origin: bottom right;
+  }
+
+  .property-hero-image::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 42%;
+    height: 68%;
+    background:
+      radial-gradient(circle at 76% 14%, rgba(130, 190, 80, 0.6) 0 7px, transparent 8px),
+      radial-gradient(circle at 88% 28%, rgba(130, 190, 80, 0.55) 0 8px, transparent 9px),
+      radial-gradient(circle at 72% 42%, rgba(130, 190, 80, 0.5) 0 6px, transparent 7px),
+      linear-gradient(135deg, transparent 0%, transparent 54%, rgba(65, 100, 135, 0.2) 55%, rgba(65, 100, 135, 0.2) 60%, transparent 61%);
   }
 }
 

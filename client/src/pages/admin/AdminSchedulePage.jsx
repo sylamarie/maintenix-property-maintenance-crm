@@ -107,12 +107,18 @@ const AdminSchedulePage = () => {
 
       {isLoading ? (
         <div className="panel p-6 text-sm font-medium text-ink-500">
-          Loading schedule...
+          <div className="flex items-center gap-3">
+            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-brand-700" />
+            Loading schedule...
+          </div>
         </div>
       ) : jobs.length ? (
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {jobs.map((job) => (
-            <article key={job.id} className="panel p-5">
+            <article
+              key={job.id}
+              className="panel p-5 transition hover:-translate-y-0.5 hover:shadow-soft sm:p-6"
+            >
               <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -130,7 +136,7 @@ const AdminSchedulePage = () => {
                     {job.property.postcode}
                   </p>
                 </div>
-                <div className="grid gap-1 rounded-md bg-ink-50 px-4 py-3 text-sm text-ink-700">
+                <div className="grid gap-1 rounded-xl border border-ink-100 bg-ink-50 px-4 py-3 text-sm text-ink-700">
                   <p>Scheduled: {formatDate(job.scheduledDate)}</p>
                   <p>Due: {formatDate(job.dueDate)}</p>
                   <p>

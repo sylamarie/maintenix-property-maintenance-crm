@@ -1,17 +1,17 @@
 import clsx from 'clsx';
 
 const priorityStyles = {
-  low: 'bg-slate-100 text-slate-700',
-  medium: 'bg-sky-100 text-sky-700',
-  high: 'bg-amber-100 text-amber-800',
-  urgent: 'bg-rose-100 text-rose-700'
+  low: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  medium: 'border-sky-200 bg-sky-50 text-sky-700',
+  high: 'border-amber-200 bg-amber-50 text-amber-800',
+  urgent: 'border-rose-200 bg-rose-50 text-rose-700'
 };
 
 const PriorityBadge = ({ priority }) => {
   return (
     <span
       className={clsx(
-        'inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold capitalize',
+        'inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-semibold capitalize',
         priorityStyles[priority] || priorityStyles.medium
       )}
     >
