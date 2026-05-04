@@ -3,9 +3,12 @@ import { Link } from 'react-router-dom';
 import { FileText, Plus } from 'lucide-react';
 
 import { adminApi } from '../../api/adminApi.js';
+import ActionButton from '../../components/ui/ActionButton.jsx';
+import ActionGroup from '../../components/ui/ActionGroup.jsx';
 import ConfirmModal from '../../components/ui/ConfirmModal.jsx';
 import DataTable from '../../components/ui/DataTable.jsx';
 import EmptyState from '../../components/ui/EmptyState.jsx';
+import FilterToolbar from '../../components/ui/FilterToolbar.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import PriorityBadge from '../../components/ui/PriorityBadge.jsx';
 import SearchInput from '../../components/ui/SearchInput.jsx';
@@ -188,29 +191,33 @@ const AdminJobsPage = () => {
       key: 'actions',
       header: 'Actions',
       render: (job) => (
-        <div className="flex flex-wrap gap-2">
-          <Link
+        <ActionGroup>
+          <ActionButton
+            as={Link}
             to={`/reports/jobs/${job.id}`}
-            className="inline-flex items-center gap-1.5 rounded-md border border-ink-100 px-3 py-1.5 font-semibold text-ink-700 hover:bg-ink-50"
+            icon={FileText}
+            size="sm"
+            variant="secondary"
           >
-            <FileText className="h-3.5 w-3.5" aria-hidden="true" />
             Report
-          </Link>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => setEditingJob(job)}
-            className="rounded-md border border-ink-100 px-3 py-1.5 font-semibold text-ink-700 hover:bg-ink-50"
+            size="sm"
+            variant="secondary"
           >
             Edit
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => setDeleteTarget(job)}
-            className="rounded-md border border-rose-200 px-3 py-1.5 font-semibold text-rose-700 hover:bg-rose-50"
+            size="sm"
+            variant="danger"
           >
             Delete
-          </button>
-        </div>
+          </ActionButton>
+        </ActionGroup>
       )
     }
   ];
@@ -222,17 +229,17 @@ const AdminJobsPage = () => {
         title="Jobs"
         description="Create, assign, filter, and update property maintenance work orders."
         action={
-          <Link
+          <ActionButton
+            as={Link}
             to="/admin/jobs/new"
-            className="inline-flex items-center gap-2 rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900"
+            icon={Plus}
           >
-            <Plus className="h-4 w-4" aria-hidden="true" />
             New job
-          </Link>
+          </ActionButton>
         }
       />
 
-      <div className="grid gap-3 xl:grid-cols-[1fr_160px_160px_220px_220px]">
+      <FilterToolbar className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_160px_160px_220px_220px]">
         <SearchInput
           value={filters.search}
           onChange={(value) => setFilter('search', value)}
@@ -290,10 +297,10 @@ const AdminJobsPage = () => {
             </option>
           ))}
         </Select>
-      </div>
+      </FilterToolbar>
 
       {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
+        <div className="alert-error">
           {error}
         </div>
       ) : null}
@@ -319,12 +326,12 @@ const AdminJobsPage = () => {
             title="No jobs found"
             description="Create work orders and assign them to field operatives."
             action={
-              <Link
+              <ActionButton
+                as={Link}
                 to="/admin/jobs/new"
-                className="inline-flex rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900"
               >
                 Create job
-              </Link>
+              </ActionButton>
             }
           />
         }

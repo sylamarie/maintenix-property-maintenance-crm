@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react';
 
 import { adminApi } from '../../api/adminApi.js';
 import { getUploadUrl } from '../../api/operativeApi.js';
+import ActionButton from '../../components/ui/ActionButton.jsx';
 import ConfirmModal from '../../components/ui/ConfirmModal.jsx';
 import DataTable from '../../components/ui/DataTable.jsx';
 import EmptyState from '../../components/ui/EmptyState.jsx';
+import FilterToolbar from '../../components/ui/FilterToolbar.jsx';
 import FormInput from '../../components/ui/FormInput.jsx';
 import ImageAttachment from '../../components/ui/ImageAttachment.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
@@ -177,13 +179,14 @@ const AdminVariationsPage = () => {
       key: 'actions',
       header: 'Actions',
       render: (variation) => (
-        <button
+        <ActionButton
           type="button"
           onClick={() => selectVariation(variation)}
-          className="rounded-md border border-ink-100 px-3 py-1.5 font-semibold text-ink-700 hover:bg-ink-50"
+          size="sm"
+          variant="secondary"
         >
           Review
-        </button>
+        </ActionButton>
       )
     }
   ];
@@ -196,7 +199,7 @@ const AdminVariationsPage = () => {
         description="Review extra work raised by operatives, price requests, and send them for client approval."
       />
 
-      <div className="grid gap-3 md:grid-cols-[1fr_240px]">
+      <FilterToolbar className="grid gap-4 md:grid-cols-[minmax(0,1fr)_240px]">
         <SearchInput
           value={filters.search}
           onChange={(value) => setFilter('search', value)}
@@ -215,10 +218,10 @@ const AdminVariationsPage = () => {
             </option>
           ))}
         </Select>
-      </div>
+      </FilterToolbar>
 
       {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
+        <div className="alert-error">
           {error}
         </div>
       ) : null}
@@ -309,7 +312,10 @@ const AdminVariationsPage = () => {
             </div>
           </div>
 
-          <form className="rounded-lg border border-ink-100 p-4" onSubmit={sendForClientApproval}>
+          <form
+            className="rounded-lg border border-ink-100 bg-ink-50/40 p-4"
+            onSubmit={sendForClientApproval}
+          >
             <h3 className="text-base font-semibold text-ink-900">
               Admin review
             </h3>
@@ -333,37 +339,36 @@ const AdminVariationsPage = () => {
               />
             </div>
             {reviewError ? (
-              <div className="mt-4 rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
+              <div className="alert-error mt-4">
                 {reviewError}
               </div>
             ) : null}
             {message ? (
-              <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+              <div className="alert-success mt-4">
                 {message}
               </div>
             ) : null}
             <div className="mt-5 flex flex-wrap gap-3">
-              <button
+              <ActionButton
                 type="submit"
                 disabled={
                   isReviewing ||
                   selectedVariation.status !== 'pending_admin_review'
                 }
-                className="rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900 disabled:bg-ink-300"
               >
                 {isReviewing ? 'Working...' : 'Send for client approval'}
-              </button>
-              <button
+              </ActionButton>
+              <ActionButton
                 type="button"
                 disabled={
                   isReviewing ||
                   selectedVariation.status !== 'pending_admin_review'
                 }
                 onClick={() => setRejectTarget(selectedVariation)}
-                className="rounded-md border border-rose-200 px-4 py-2.5 text-sm font-semibold text-rose-700 hover:bg-rose-50 disabled:border-ink-100 disabled:text-ink-300"
+                variant="danger"
               >
                 Reject
-              </button>
+              </ActionButton>
             </div>
           </form>
         </section>

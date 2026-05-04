@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { adminApi } from '../../api/adminApi.js';
 import EmptyState from '../../components/ui/EmptyState.jsx';
+import FilterToolbar from '../../components/ui/FilterToolbar.jsx';
 import FormInput from '../../components/ui/FormInput.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import PriorityBadge from '../../components/ui/PriorityBadge.jsx';
@@ -62,7 +63,7 @@ const AdminSchedulePage = () => {
         description="Review scheduled work by date, status, and assigned operative."
       />
 
-      <div className="grid gap-3 md:grid-cols-3">
+      <FilterToolbar className="grid gap-4 md:grid-cols-3">
         <FormInput
           label="Scheduled date"
           name="scheduledDate"
@@ -96,10 +97,10 @@ const AdminSchedulePage = () => {
             </option>
           ))}
         </Select>
-      </div>
+      </FilterToolbar>
 
       {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
+        <div className="alert-error">
           {error}
         </div>
       ) : null}

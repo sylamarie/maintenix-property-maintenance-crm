@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { adminApi } from '../../api/adminApi.js';
+import ActionButton from '../../components/ui/ActionButton.jsx';
 import FormInput from '../../components/ui/FormInput.jsx';
 import Select from '../../components/ui/Select.jsx';
 import Textarea from '../../components/ui/Textarea.jsx';
@@ -118,14 +119,17 @@ const AdminJobForm = ({ job, onCancel, onSaved }) => {
 
   if (isLoading) {
     return (
-      <div className="panel p-5 text-sm font-medium text-ink-500">
-        Loading job form...
+      <div className="panel p-6 text-sm font-medium text-ink-500">
+        <div className="flex items-center gap-3">
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-brand-700" />
+          Loading job form...
+        </div>
       </div>
     );
   }
 
   return (
-    <form className="panel grid gap-4 p-5" onSubmit={handleSubmit}>
+    <form className="panel grid gap-5 p-5 sm:p-6" onSubmit={handleSubmit}>
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-ink-900">
           {job ? 'Edit job' : 'Create job'}
@@ -142,7 +146,7 @@ const AdminJobForm = ({ job, onCancel, onSaved }) => {
       </div>
 
       {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
+        <div className="alert-error">
           {error}
         </div>
       ) : null}
@@ -254,13 +258,12 @@ const AdminJobForm = ({ job, onCancel, onSaved }) => {
       />
 
       <div>
-        <button
+        <ActionButton
           type="submit"
           disabled={isSaving}
-          className="rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900 disabled:bg-ink-300"
         >
           {isSaving ? 'Saving...' : job ? 'Save changes' : 'Create job'}
-        </button>
+        </ActionButton>
       </div>
     </form>
   );

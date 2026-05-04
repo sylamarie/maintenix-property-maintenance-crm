@@ -1,4 +1,4 @@
-import { Bell, LogOut, Menu, Search } from 'lucide-react';
+import { Bell, LogOut, Menu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../auth/AuthContext.jsx';
@@ -23,21 +23,22 @@ const Topbar = ({ onOpenSidebar }) => {
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
-        <div className="hidden w-80 items-center gap-2 rounded-md border border-ink-100 bg-ink-50 px-3 py-2 text-sm text-ink-500 md:flex">
-          <Search className="h-4 w-4" aria-hidden="true" />
-          <span>Search jobs, clients, properties</span>
+        <div className="hidden text-sm font-medium text-ink-500 lg:block">
+          {user?.role ? (
+            <span className="capitalize">{user.role} workspace</span>
+          ) : null}
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3">
         <button
           type="button"
-          className="rounded-md p-2 text-ink-500 hover:bg-ink-50"
+          className="rounded-md p-2 text-ink-500 transition hover:bg-ink-50 hover:text-ink-900"
           aria-label="Notifications"
         >
           <Bell className="h-5 w-5" aria-hidden="true" />
         </button>
-        <div className="flex items-center gap-3 rounded-md border border-ink-100 bg-white px-3 py-2">
+        <div className="flex h-10 items-center gap-3 rounded-md border border-ink-100 bg-white px-2.5 shadow-sm sm:px-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-sm font-semibold text-brand-700">
             {user?.name?.charAt(0) || 'M'}
           </div>
@@ -49,7 +50,7 @@ const Topbar = ({ onOpenSidebar }) => {
         <button
           type="button"
           onClick={handleLogout}
-          className="rounded-md p-2 text-ink-500 hover:bg-ink-50 hover:text-ink-900"
+          className="rounded-md p-2 text-ink-500 transition hover:bg-ink-50 hover:text-ink-900"
           aria-label="Log out"
         >
           <LogOut className="h-5 w-5" aria-hidden="true" />

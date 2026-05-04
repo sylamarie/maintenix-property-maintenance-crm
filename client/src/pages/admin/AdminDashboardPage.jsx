@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { adminApi } from '../../api/adminApi.js';
+import ActionButton from '../../components/ui/ActionButton.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import PriorityBadge from '../../components/ui/PriorityBadge.jsx';
 import StatCard from '../../components/ui/StatCard.jsx';
@@ -91,17 +92,17 @@ const AdminDashboardPage = () => {
         title="Operations overview"
         description="Live CRM and work order metrics from the Maintenix database."
         action={
-          <Link
+          <ActionButton
+            as={Link}
             to="/admin/jobs/new"
-            className="rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900"
           >
             New job
-          </Link>
+          </ActionButton>
         }
       />
 
       {error ? (
-        <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
+        <div className="alert-error">
           {error}
         </div>
       ) : null}

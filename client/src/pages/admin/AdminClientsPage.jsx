@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 
 import { adminApi } from '../../api/adminApi.js';
+import ActionButton from '../../components/ui/ActionButton.jsx';
+import ActionGroup from '../../components/ui/ActionGroup.jsx';
 import ConfirmModal from '../../components/ui/ConfirmModal.jsx';
 import DataTable from '../../components/ui/DataTable.jsx';
 import EmptyState from '../../components/ui/EmptyState.jsx';
+import FilterToolbar from '../../components/ui/FilterToolbar.jsx';
 import FormInput from '../../components/ui/FormInput.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import SearchInput from '../../components/ui/SearchInput.jsx';
@@ -151,22 +154,24 @@ const AdminClientsPage = () => {
       key: 'actions',
       header: 'Actions',
       render: (client) => (
-        <div className="flex gap-2">
-          <button
+        <ActionGroup>
+          <ActionButton
             type="button"
             onClick={() => openEditForm(client)}
-            className="rounded-md border border-ink-100 px-3 py-1.5 font-semibold text-ink-700 hover:bg-ink-50"
+            size="sm"
+            variant="secondary"
           >
             Edit
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             type="button"
             onClick={() => setDeleteTarget(client)}
-            className="rounded-md border border-rose-200 px-3 py-1.5 font-semibold text-rose-700 hover:bg-rose-50"
+            size="sm"
+            variant="danger"
           >
             Delete
-          </button>
-        </div>
+          </ActionButton>
+        </ActionGroup>
       )
     }
   ];
@@ -178,32 +183,32 @@ const AdminClientsPage = () => {
         title="Clients"
         description="Manage client contacts and billing details for maintenance portfolios."
         action={
-          <button
+          <ActionButton
             type="button"
             onClick={openCreateForm}
-            className="inline-flex items-center gap-2 rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900"
+            icon={Plus}
           >
-            <Plus className="h-4 w-4" aria-hidden="true" />
             Add client
-          </button>
+          </ActionButton>
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-[1fr_0.8fr]">
+      <FilterToolbar>
         <SearchInput
           value={search}
           onChange={setSearch}
           placeholder="Search clients by name, contact, or email"
         />
-        {error ? (
-          <div className="rounded-md border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700">
-            {error}
-          </div>
-        ) : null}
-      </div>
+      </FilterToolbar>
+
+      {error ? (
+        <div className="alert-error">
+          {error}
+        </div>
+      ) : null}
 
       {isFormOpen ? (
-        <form className="panel grid gap-4 p-5" onSubmit={handleSubmit}>
+        <form className="panel grid gap-5 p-5 sm:p-6" onSubmit={handleSubmit}>
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-ink-900">
               {editingClient ? 'Edit client' : 'Add client'}
@@ -253,13 +258,12 @@ const AdminClientsPage = () => {
             onChange={handleChange}
           />
           <div>
-            <button
+            <ActionButton
               type="submit"
               disabled={isSaving}
-              className="rounded-md bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-900 disabled:bg-ink-300"
             >
               {isSaving ? 'Saving...' : 'Save client'}
-            </button>
+            </ActionButton>
           </div>
         </form>
       ) : null}
