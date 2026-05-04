@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const requiredInProduction = ['DATABASE_URL', 'JWT_SECRET'];
+const requiredInProduction = ['CLIENT_URL', 'DATABASE_URL', 'JWT_SECRET'];
 
 if (process.env.NODE_ENV === 'production') {
   requiredInProduction.forEach((key) => {
