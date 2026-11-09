@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ClipboardList,
@@ -16,8 +16,10 @@ import { adminApi } from '../../api/adminApi.js';
 import ActionButton from '../../components/ui/ActionButton.jsx';
 import ConfirmModal from '../../components/ui/ConfirmModal.jsx';
 import EmptyState from '../../components/ui/EmptyState.jsx';
+import Pagination from '../../components/ui/Pagination.jsx';
 import PriorityBadge from '../../components/ui/PriorityBadge.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue.js';
 import { jobPriorities, jobStatuses } from '../../utils/constants.js';
 import { formatDate } from '../../utils/formatters.js';
 import AdminJobForm from './AdminJobForm.jsx';
@@ -147,8 +149,15 @@ const JobActionsMenu = ({
   </div>
 );
 
+const PAGE_SIZE = 10;
+
 const AdminJobsPage = () => {
   const [jobs, setJobs] = useState([]);
+  const [pagination, setPagination] = useState(null);
+  const [page, setPage] = useState(1);
+  // Each request gets a number; only the newest one is allowed to update the
+  // screen, so a slow older response can never overwrite a newer one.
+  const latestRequestId = useRef(0);
   const [clients, setClients] = useState([]);
   const [operatives, setOperatives] = useState([]);
   const [filters, setFilters] = useState({
@@ -174,16 +183,43 @@ const AdminJobsPage = () => {
     setOperatives(operativesResult);
   };
 
+  // Wait until the user pauses typing before searching.
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+
   const loadJobs = async () => {
+    const requestId = latestRequestId.current + 1;
+    latestRequestId.current = requestId;
     setIsLoading(true);
     setError('');
 
     try {
-      setJobs(await adminApi.getJobs(filters));
+      const result = await adminApi.getJobsPage({
+        ...filters,
+        search: debouncedSearch,
+        page,
+        limit: PAGE_SIZE
+      });
+
+      if (requestId !== latestRequestId.current) {
+        return;
+      }
+
+      // The last job on the last page was removed: go back one page.
+      if (result.jobs.length === 0 && page > 1 && result.pagination.totalPages < page) {
+        setPage(result.pagination.totalPages);
+        return;
+      }
+
+      setJobs(result.jobs);
+      setPagination(result.pagination);
     } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Unable to load jobs.');
+      if (requestId === latestRequestId.current) {
+        setError(requestError.response?.data?.message || 'Unable to load jobs.');
+      }
     } finally {
-      setIsLoading(false);
+      if (requestId === latestRequestId.current) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -194,11 +230,12 @@ const AdminJobsPage = () => {
   useEffect(() => {
     loadJobs();
   }, [
-    filters.search,
+    debouncedSearch,
     filters.status,
     filters.priority,
     filters.clientId,
-    filters.operativeId
+    filters.operativeId,
+    page
   ]);
 
   const operativeOptions = useMemo(
@@ -213,10 +250,12 @@ const AdminJobsPage = () => {
   const activeFilterCount = getActiveFilterCount(filters);
 
   const setFilter = (name, value) => {
+    setPage(1);
     setFilters((current) => ({ ...current, [name]: value }));
   };
 
   const resetFilters = () => {
+    setPage(1);
     setFilters({
       search: '',
       status: '',
@@ -439,7 +478,8 @@ const AdminJobsPage = () => {
                 </h2>
               </div>
               <p className="mt-1 text-sm text-ink-500">
-                Showing {jobs.length} work order{jobs.length === 1 ? '' : 's'}
+                {pagination?.total ?? jobs.length} work order
+                {(pagination?.total ?? jobs.length) === 1 ? '' : 's'}
                 {activeFilterCount ? ` with ${activeFilterCount} active filter${activeFilterCount === 1 ? '' : 's'}` : ''}
               </p>
             </div>
@@ -660,6 +700,12 @@ const AdminJobsPage = () => {
               </tbody>
             </table>
           </div>
+          <Pagination
+            pagination={pagination}
+            itemLabel="work orders"
+            isDisabled={isLoading}
+            onPageChange={setPage}
+          />
         </section>
       ) : (
         <EmptyState

@@ -15,7 +15,12 @@ const mapProperty = (row) => ({
   updatedAt: row.updated_at
 });
 
-export const listProperties = async ({ search, clientId, postcode } = {}) => {
+export const listProperties = async ({
+  search,
+  clientId,
+  postcode,
+  pagination = null
+} = {}) => {
   const values = [];
   const conditions = [];
 
@@ -36,6 +41,15 @@ export const listProperties = async ({ search, clientId, postcode } = {}) => {
     conditions.push(`p.postcode ILIKE $${values.length}`);
   }
 
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const pageValues = [...values];
+  let pageClause = '';
+
+  if (pagination) {
+    pageValues.push(pagination.limit, pagination.offset);
+    pageClause = `LIMIT $${pageValues.length - 1} OFFSET $${pageValues.length}`;
+  }
+
   const result = await query(
     `
       SELECT
@@ -45,14 +59,30 @@ export const listProperties = async ({ search, clientId, postcode } = {}) => {
       FROM properties p
       JOIN clients c ON c.id = p.client_id
       LEFT JOIN jobs j ON j.property_id = p.id
-      ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
+      ${whereClause}
       GROUP BY p.id, c.name
-      ORDER BY c.name ASC, p.name ASC
+      ORDER BY c.name ASC, p.name ASC, p.id ASC
+      ${pageClause}
+    `,
+    pageValues
+  );
+  const items = result.rows.map(mapProperty);
+
+  if (!pagination) {
+    return { items, total: items.length };
+  }
+
+  const countResult = await query(
+    `
+      SELECT COUNT(*) AS total
+      FROM properties p
+      JOIN clients c ON c.id = p.client_id
+      ${whereClause}
     `,
     values
   );
 
-  return result.rows.map(mapProperty);
+  return { items, total: Number(countResult.rows[0].total) };
 };
 
 export const getPropertyById = async (id) => {

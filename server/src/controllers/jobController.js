@@ -1,5 +1,6 @@
 import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { buildPaginationMeta, cleanSearch, parsePagination } from '../utils/pagination.js';
 import {
   cleanDate,
   cleanEnum,
@@ -111,8 +112,10 @@ const buildJobPayload = (body, existing = null, currentUser = null) => {
 };
 
 export const getJobs = asyncHandler(async (req, res) => {
-  const jobs = await listJobs({
-    search: cleanString(req.query.search),
+  const pagination = parsePagination(req.query);
+  const { items: jobs, total } = await listJobs({
+    pagination,
+    search: cleanSearch(req.query.search),
     status: cleanOptionalEnum(req.query.status, jobStatuses, 'Status'),
     priority: cleanOptionalEnum(req.query.priority, jobPriorities, 'Priority'),
     clientId: cleanString(req.query.clientId),
@@ -120,10 +123,13 @@ export const getJobs = asyncHandler(async (req, res) => {
     scheduledDate: cleanDate(req.query.scheduledDate, 'Scheduled date')
   });
 
-  res.json({ jobs });
+  res.json({
+    jobs,
+    ...(pagination && { pagination: buildPaginationMeta(pagination, total) })
+  });
 });
 
-export const getJob = asyncHandler(async (req, res) => {
+export const getJob =asyncHandler(async (req, res) => {
   const job = await getJobById(req.params.id);
 
   if (!job) {

@@ -13,7 +13,7 @@ const mapClient = (row) => ({
   updatedAt: row.updated_at
 });
 
-export const listClients = async ({ search } = {}) => {
+export const listClients = async ({ search, pagination = null } = {}) => {
   const values = [];
   const conditions = [];
 
@@ -22,6 +22,15 @@ export const listClients = async ({ search } = {}) => {
     conditions.push(
       `(c.name ILIKE $${values.length} OR c.contact_name ILIKE $${values.length} OR c.email ILIKE $${values.length})`
     );
+  }
+
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const pageValues = [...values];
+  let pageClause = '';
+
+  if (pagination) {
+    pageValues.push(pagination.limit, pagination.offset);
+    pageClause = `LIMIT $${pageValues.length - 1} OFFSET $${pageValues.length}`;
   }
 
   const result = await query(
@@ -33,14 +42,25 @@ export const listClients = async ({ search } = {}) => {
       FROM clients c
       LEFT JOIN properties p ON p.client_id = c.id
       LEFT JOIN jobs j ON j.client_id = c.id
-      ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
+      ${whereClause}
       GROUP BY c.id
-      ORDER BY c.name ASC
+      ORDER BY c.name ASC, c.id ASC
+      ${pageClause}
     `,
+    pageValues
+  );
+  const items = result.rows.map(mapClient);
+
+  if (!pagination) {
+    return { items, total: items.length };
+  }
+
+  const countResult = await query(
+    `SELECT COUNT(*) AS total FROM clients c ${whereClause}`,
     values
   );
 
-  return result.rows.map(mapClient);
+  return { items, total: Number(countResult.rows[0].total) };
 };
 
 export const getClientById = async (id) => {

@@ -5,6 +5,7 @@ import {
 } from '../utils/validators.js';
 import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { buildPaginationMeta, cleanSearch, parsePagination } from '../utils/pagination.js';
 import {
   createClient,
   deleteClient,
@@ -33,11 +34,16 @@ const buildClientPayload = (body, existing = null) => ({
 });
 
 export const getClients = asyncHandler(async (req, res) => {
-  const clients = await listClients({
-    search: cleanString(req.query.search)
+  const pagination = parsePagination(req.query);
+  const { items: clients, total } = await listClients({
+    pagination,
+    search: cleanSearch(req.query.search)
   });
 
-  res.json({ clients });
+  res.json({
+    clients,
+    ...(pagination && { pagination: buildPaginationMeta(pagination, total) })
+  });
 });
 
 export const getClient = asyncHandler(async (req, res) => {

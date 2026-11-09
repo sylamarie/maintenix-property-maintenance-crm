@@ -191,3 +191,41 @@ CREATE TRIGGER variations_set_updated_at
 BEFORE UPDATE ON variations
 FOR EACH ROW
 EXECUTE FUNCTION set_updated_at();
+
+-- ---------------------------------------------------------------------------
+-- Performance indexes and data-safety constraints (safe to run repeatedly)
+-- ---------------------------------------------------------------------------
+
+-- Trigram indexes make "contains" searches (ILIKE '%text%') fast.
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+CREATE INDEX IF NOT EXISTS jobs_title_trgm_idx ON jobs USING gin (title gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS clients_name_trgm_idx ON clients USING gin (name gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS properties_name_trgm_idx ON properties USING gin (name gin_trgm_ops);
+
+-- Common filter combinations: "this operative's jobs by status", "this client's jobs by status".
+CREATE INDEX IF NOT EXISTS jobs_operative_status_idx ON jobs (assigned_operative_id, status);
+CREATE INDEX IF NOT EXISTS jobs_client_status_idx ON jobs (client_id, status);
+
+CREATE INDEX IF NOT EXISTS users_role_active_idx ON users (role, is_active);
+
+-- One login user can belong to at most one client record.
+CREATE UNIQUE INDEX IF NOT EXISTS clients_client_user_id_unique_idx
+  ON clients (client_user_id)
+  WHERE client_user_id IS NOT NULL;
+
+-- Money values can never be negative.
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'variations_estimated_amount_non_negative') THEN
+    ALTER TABLE variations
+      ADD CONSTRAINT variations_estimated_amount_non_negative
+      CHECK (estimated_amount IS NULL OR estimated_amount >= 0);
+  END IF;
+
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'variations_admin_price_non_negative') THEN
+    ALTER TABLE variations
+      ADD CONSTRAINT variations_admin_price_non_negative
+      CHECK (admin_price IS NULL OR admin_price >= 0);
+  END IF;
+END $$;

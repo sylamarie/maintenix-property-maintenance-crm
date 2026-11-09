@@ -4,6 +4,7 @@ import {
 } from '../utils/validators.js';
 import { ApiError } from '../utils/apiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { buildPaginationMeta, cleanSearch, parsePagination } from '../utils/pagination.js';
 import {
   createProperty,
   deleteProperty,
@@ -44,13 +45,18 @@ const buildPropertyPayload = (body, existing = null) => ({
 });
 
 export const getProperties = asyncHandler(async (req, res) => {
-  const properties = await listProperties({
-    search: cleanString(req.query.search),
+  const pagination = parsePagination(req.query);
+  const { items: properties, total } = await listProperties({
+    pagination,
+    search: cleanSearch(req.query.search),
     clientId: cleanString(req.query.clientId),
-    postcode: cleanString(req.query.postcode)
+    postcode: cleanSearch(req.query.postcode)
   });
 
-  res.json({ properties });
+  res.json({
+    properties,
+    ...(pagination && { pagination: buildPaginationMeta(pagination, total) })
+  });
 });
 
 export const getProperty = asyncHandler(async (req, res) => {
