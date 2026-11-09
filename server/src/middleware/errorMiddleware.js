@@ -30,8 +30,12 @@ export const errorHandler = (error, req, res, next) => {
     postgresStatusMap[error.code] ||
     uploadStatusMap[error.code] ||
     500;
-  const resolvedMessage =
-    error.statusCode
+  // Unexpected 500 errors never send their raw message to the browser,
+  // because it can reveal internals (SQL, file paths, library details).
+  const isUnexpectedServerError = statusCode >= 500 && !error.statusCode;
+  const resolvedMessage = isUnexpectedServerError
+    ? 'Something went wrong. Please try again.'
+    : error.statusCode
       ? error.message || 'Something went wrong'
       : uploadMessageMap[error.code] ||
         postgresMessageMap[error.code] ||
@@ -44,7 +48,6 @@ export const errorHandler = (error, req, res, next) => {
 
   res.status(statusCode).json({
     message: resolvedMessage,
-    details: error.details || null,
-    stack: process.env.NODE_ENV === 'production' ? undefined : error.stack
+    details: error.details || null
   });
 };

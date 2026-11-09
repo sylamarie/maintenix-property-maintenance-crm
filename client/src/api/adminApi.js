@@ -61,6 +61,15 @@ export const adminApi = {
     return response.data.jobs;
   },
 
+  // Paginated version: returns { jobs, pagination } so the page can show
+  // "Page 2 of 7". Pass `page` and `limit` in params.
+  getJobsPage: async (params) => {
+    const response = await apiClient.get('/jobs', {
+      params: buildParams(params)
+    });
+    return { jobs: response.data.jobs, pagination: response.data.pagination };
+  },
+
   getJob: async (id) => {
     const response = await apiClient.get(`/jobs/${id}`);
     return response.data.job;

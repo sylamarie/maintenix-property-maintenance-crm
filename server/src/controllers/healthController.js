@@ -25,8 +25,11 @@ export const getHealth = asyncHandler(async (req, res) => {
     };
   }
 
-  res.json({
-    status: 'ok',
+  const isHealthy = database.status === 'connected';
+
+  // 503 lets hosting platforms detect that the database is down.
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? 'ok' : 'degraded',
     service: 'maintenix-api',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),

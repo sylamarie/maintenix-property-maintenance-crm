@@ -27,13 +27,21 @@ export const uploadJobPhoto = asyncHandler(async (req, res) => {
 
   const fileUrl = `/uploads/jobs/${req.params.jobId}/${req.file.filename}`;
 
-  const photo = await createJobPhoto({
-    jobId: req.params.jobId,
-    uploadedBy: req.user.id,
-    photoType,
-    fileUrl,
-    caption: cleanString(req.body.caption)
-  });
+  let photo;
+
+  try {
+    photo = await createJobPhoto({
+      jobId: req.params.jobId,
+      uploadedBy: req.user.id,
+      photoType,
+      fileUrl,
+      caption: cleanString(req.body.caption)
+    });
+  } catch (error) {
+    // Do not leave an orphan file on disk when the database save fails.
+    fs.rmSync(req.file.path, { force: true });
+    throw error;
+  }
 
   res.status(201).json({ photo });
 });

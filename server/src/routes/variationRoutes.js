@@ -9,7 +9,10 @@ import {
 } from '../controllers/variationController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
 import { requireRole } from '../middleware/roleMiddleware.js';
-import { uploadVariationPhotoFile } from '../middleware/uploadMiddleware.js';
+import {
+  uploadVariationPhotoFile,
+  verifyUploadedImage
+} from '../middleware/uploadMiddleware.js';
 
 const router = Router();
 
@@ -20,6 +23,7 @@ router.post(
   '/',
   requireRole('operative'),
   uploadVariationPhotoFile.single('photo'),
+  verifyUploadedImage,
   postVariation
 );
 router.get('/:id', requireRole('admin', 'operative', 'client'), getVariation);

@@ -62,7 +62,7 @@ const LoginPage = () => {
     }
   };
 
-  const useDemoAccount = (account) => {
+  const fillDemoAccount = (account) => {
     setFormData({
       email: account.email,
       password: account.password
@@ -150,7 +150,7 @@ const LoginPage = () => {
           <button
             type="button"
             key={account.email}
-            onClick={() => useDemoAccount(account)}
+            onClick={() => fillDemoAccount(account)}
             className="flex items-center justify-between rounded-lg border border-ink-100 bg-white px-4 py-3 text-left text-sm transition hover:border-brand-500 hover:bg-brand-50"
           >
             <span className="font-medium text-ink-900">{account.role}</span>

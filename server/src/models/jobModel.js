@@ -76,7 +76,8 @@ export const listJobs = async ({
   priority,
   clientId,
   operativeId,
-  scheduledDate
+  scheduledDate,
+  pagination = null
 } = {}) => {
   const values = [];
   const conditions = [];
@@ -113,19 +114,48 @@ export const listJobs = async ({
     conditions.push(`j.scheduled_date = $${values.length}`);
   }
 
+  const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+  const pageValues = [...values];
+  let pageClause = '';
+
+  if (pagination) {
+    pageValues.push(pagination.limit, pagination.offset);
+    pageClause = `LIMIT $${pageValues.length - 1} OFFSET $${pageValues.length}`;
+  }
+
   const result = await query(
     `
       ${baseSelect}
-      ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}
+      ${whereClause}
       ORDER BY
         j.scheduled_date ASC NULLS LAST,
         j.due_date ASC NULLS LAST,
-        j.created_at DESC
+        j.created_at DESC,
+        j.id ASC
+      ${pageClause}
+    `,
+    pageValues
+  );
+  const items = result.rows.map(mapJob);
+
+  if (!pagination) {
+    return { items, total: items.length };
+  }
+
+  // Total number of matching jobs (ignoring the page), so the page can show
+  // "Page 2 of 7".
+  const countResult = await query(
+    `
+      SELECT COUNT(*) AS total
+      FROM jobs j
+      JOIN clients c ON c.id = j.client_id
+      JOIN properties p ON p.id = j.property_id
+      ${whereClause}
     `,
     values
   );
 
-  return result.rows.map(mapJob);
+  return { items, total: Number(countResult.rows[0].total) };
 };
 
 export const getJobById = async (id) => {
