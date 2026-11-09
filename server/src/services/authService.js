@@ -25,6 +25,11 @@ export const loginWithPassword = async ({ email, password }) => {
     throw new ApiError(400, 'Email and password are required.');
   }
 
+  // Very long strings make bcrypt do needless work, so reject them early.
+  if (typeof password !== 'string' || password.length > 128 || normalisedEmail.length > 254) {
+    throw new ApiError(400, 'Email or password is too long.');
+  }
+
   const user = await findUserByEmail(normalisedEmail);
 
   if (!user || !user.is_active) {

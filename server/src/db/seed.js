@@ -3,6 +3,13 @@ import bcrypt from 'bcryptjs';
 import { closePool, query } from '../config/db.js';
 import { getDatabaseErrorMessage } from '../utils/databaseError.js';
 
+// The demo accounts use a publicly documented password, so never create them
+// on a production database.
+if (process.env.NODE_ENV === 'production') {
+  console.error('Refusing to seed demo users when NODE_ENV=production.');
+  process.exit(1);
+}
+
 const demoUsers = [
   {
     name: 'Maintenix Admin',
