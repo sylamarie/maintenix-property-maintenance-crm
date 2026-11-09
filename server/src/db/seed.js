@@ -3,32 +3,50 @@ import bcrypt from 'bcryptjs';
 import { closePool, query } from '../config/db.js';
 import { getDatabaseErrorMessage } from '../utils/databaseError.js';
 
-// The demo accounts use a publicly documented password, so never create them
-// on a production database.
-if (process.env.NODE_ENV === 'production') {
-  console.error('Refusing to seed demo users when NODE_ENV=production.');
+// Demo accounts need a password. The public one (Password123, listed in the
+// README) is only allowed on a database running on THIS computer. For any
+// hosted database you must choose your own password:
+//   DEMO_PASSWORD=<at least 12 characters> npm run db:seed
+const databaseUrl =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/maintenix';
+const databaseHost = new URL(databaseUrl).hostname;
+const isLocalDatabase = ['localhost', '127.0.0.1', '::1'].includes(databaseHost);
+const customPassword = process.env.DEMO_PASSWORD;
+
+if (customPassword && customPassword.length < 12) {
+  console.error('DEMO_PASSWORD must be at least 12 characters.');
   process.exit(1);
 }
+
+if (!customPassword && (!isLocalDatabase || process.env.NODE_ENV === 'production')) {
+  console.error(
+    'Refusing to seed a hosted database with the public demo password. ' +
+      'Set DEMO_PASSWORD to a password of your own (12+ characters) and try again.'
+  );
+  process.exit(1);
+}
+
+const demoPassword = customPassword || 'Password123';
 
 const demoUsers = [
   {
     name: 'Maintenix Admin',
     email: 'admin@maintenix.com',
-    password: 'Password123',
+    password: demoPassword,
     role: 'admin',
     phone: '+44 20 7946 0101'
   },
   {
     name: 'Amelia Clarke',
     email: 'operative@maintenix.com',
-    password: 'Password123',
+    password: demoPassword,
     role: 'operative',
     phone: '+44 7700 900101'
   },
   {
     name: 'Northstar Housing Association',
     email: 'client@maintenix.com',
-    password: 'Password123',
+    password: demoPassword,
     role: 'client',
     phone: '+44 20 7946 0202'
   }
