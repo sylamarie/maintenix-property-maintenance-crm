@@ -15,9 +15,19 @@
     "db:schema": "npm run db:schema --workspace server",
     "db:seed": "npm run db:seed --workspace server",
     "db:test": "npm run db:test --workspace server",
-    "build": "npm run build --workspace client"
+    "build": "npm run build --workspace client",
+    "lint": "eslint .",
+    "test": "npm run test --workspace server",
+    "format": "prettier --write ."
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@eslint/js": "^9.39.5",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10"
   }
 }

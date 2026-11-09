@@ -10,7 +10,8 @@
     "start": "node src/server.js",
     "db:schema": "node src/db/runSchema.js",
     "db:seed": "node src/db/seed.js",
-    "db:test": "node src/db/testConnection.js"
+    "db:test": "node src/db/testConnection.js",
+    "test": "vitest run"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -23,5 +24,9 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.2",
     "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.2",
+    "vitest": "^5.1.0"
   }
 }
