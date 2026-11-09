@@ -47,7 +47,19 @@ if (env.nodeEnv === 'development') {
   app.use(morgan('dev'));
 }
 
-app.use('/uploads', express.static(path.join(serverRoot, env.uploadDir)));
+// Uploaded files are served as inert images only: no folder listing, no hidden
+// files, and a strict policy so a file can never run scripts even if one slips in.
+app.use(
+  '/uploads',
+  express.static(path.join(serverRoot, env.uploadDir), {
+    dotfiles: 'deny',
+    index: false,
+    setHeaders(res) {
+      res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+    }
+  })
+);
 app.use('/api', apiRoutes);
 
 app.get('/', (req, res) => {
