@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-import { getStoredToken } from '../auth/authStorage.js';
+import { clearStoredToken, getStoredToken } from '../auth/authStorage.js';
+
+// AuthProvider registers a function here. The API client calls it when the
+// server says our login has expired, so the app can send the user to /login.
+let unauthorizedHandler = null;
+
+export const setUnauthorizedHandler = (handler) => {
+  unauthorizedHandler = handler;
+};
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
@@ -26,3 +34,19 @@ apiClient.interceptors.request.use((config) => {
 
   return config;
 });
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isLoginRequest = error.config?.url?.includes('/auth/login');
+
+    // 401 on any request except a wrong-password login means our saved login
+    // pass is no longer valid (expired, or the account was deactivated).
+    if (error.response?.status === 401 && !isLoginRequest && getStoredToken()) {
+      clearStoredToken();
+      unauthorizedHandler?.();
+    }
+
+    return Promise.reject(error);
+  }
+);

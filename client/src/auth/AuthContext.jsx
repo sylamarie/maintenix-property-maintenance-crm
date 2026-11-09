@@ -1,6 +1,13 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from 'react';
 
-import { apiClient } from '../api/apiClient.js';
+import { apiClient, setUnauthorizedHandler } from '../api/apiClient.js';
 import {
   clearStoredToken,
   getStoredToken,
@@ -25,7 +32,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await apiClient.get('/auth/me');
         setUser(response.data.user);
-      } catch (error) {
+      } catch {
         clearStoredToken();
         setUser(null);
       } finally {
@@ -36,7 +43,15 @@ export const AuthProvider = ({ children }) => {
     loadCurrentUser();
   }, []);
 
-  const login = async ({ email, password }) => {
+  // If any later request gets a 401 (login expired), sign the user out.
+  // ProtectedRoute then redirects to the login page.
+  useEffect(() => {
+    setUnauthorizedHandler(() => setUser(null));
+
+    return () => setUnauthorizedHandler(null);
+  }, []);
+
+  const login = useCallback(async ({ email, password }) => {
     const response = await apiClient.post('/auth/login', {
       email,
       password
@@ -46,12 +61,12 @@ export const AuthProvider = ({ children }) => {
     setUser(response.data.user);
 
     return response.data.user;
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearStoredToken();
     setUser(null);
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -61,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       login,
       logout
     }),
-    [isLoading, user]
+    [isLoading, user, login, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -2,10 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ClipboardList,
-  FileText,
   ListFilter,
   MapPin,
-  MoreHorizontal,
   Plus,
   Search,
   SlidersHorizontal,
@@ -23,6 +21,7 @@ import { useDebouncedValue } from '../../hooks/useDebouncedValue.js';
 import { jobPriorities, jobStatuses } from '../../utils/constants.js';
 import { formatDate } from '../../utils/formatters.js';
 import AdminJobForm from './AdminJobForm.jsx';
+import JobActionsMenu from './JobActionsMenu.jsx';
 
 const getJobCode = (id) => `JOB-${String(id).padStart(4, '0')}`;
 
@@ -58,95 +57,6 @@ const ToolbarSelect = ({ label, name, value, onChange, children }) => (
       {children}
     </select>
   </label>
-);
-
-const JobActionsMenu = ({
-  isOpen,
-  job,
-  onAssignmentChange,
-  onDelete,
-  onEdit,
-  onToggle,
-  onStatusChange,
-  operativeOptions
-}) => (
-  <div className="relative inline-flex">
-    <button
-      type="button"
-      onClick={onToggle}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-ink-500 transition hover:bg-ink-50 hover:text-ink-900"
-      aria-label={`Open actions for ${job.title}`}
-      aria-expanded={isOpen}
-      aria-haspopup="menu"
-    >
-      <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
-    </button>
-    {isOpen ? (
-      <div
-        className="absolute right-0 top-11 z-20 w-64 rounded-xl border border-ink-100 bg-white p-3 text-left shadow-soft"
-        role="menu"
-      >
-        <div className="grid gap-2">
-          <Link
-            to={`/reports/jobs/${job.id}`}
-            className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-ink-700 transition hover:bg-ink-50"
-            onClick={onToggle}
-            role="menuitem"
-          >
-            <FileText className="h-4 w-4" aria-hidden="true" />
-            Report
-          </Link>
-          <button
-            type="button"
-            onClick={onEdit}
-            className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-ink-700 transition hover:bg-ink-50"
-            role="menuitem"
-          >
-            Edit job
-          </button>
-          <label className="grid gap-1 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-500">
-            Status
-            <select
-              className="h-9 rounded-lg border border-ink-100 bg-white px-2 text-sm font-medium normal-case tracking-normal text-ink-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-              value={job.status}
-              onChange={(event) => onStatusChange(job, event.target.value)}
-            >
-              {jobStatuses.map((status) => (
-                <option key={status.value} value={status.value}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-500">
-            Assignee
-            <select
-              className="h-9 rounded-lg border border-ink-100 bg-white px-2 text-sm font-medium normal-case tracking-normal text-ink-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-              value={job.assignedOperativeId || ''}
-              onChange={(event) =>
-                onAssignmentChange(job, event.target.value)
-              }
-            >
-              <option value="">Unassigned</option>
-              {operativeOptions.map((operative) => (
-                <option key={operative.value} value={operative.value}>
-                  {operative.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            onClick={onDelete}
-            className="rounded-lg px-3 py-2 text-left text-sm font-semibold text-rose-700 transition hover:bg-rose-50"
-            role="menuitem"
-          >
-            Delete job
-          </button>
-        </div>
-      </div>
-    ) : null}
-  </div>
 );
 
 const PAGE_SIZE = 10;
@@ -463,12 +373,18 @@ const AdminJobsPage = () => {
         />
       ) : null}
 
-      {isLoading ? (
+      {/* The "Loading" box only replaces the list when there is nothing to show
+          yet. On later refreshes (changing a status, paging, searching) the
+          current rows stay on screen, so open menus are not torn down. */}
+      {isLoading && jobs.length === 0 ? (
         <div className="panel p-8 text-sm font-medium text-ink-500">
           Loading records...
         </div>
       ) : jobs.length ? (
-        <section className="panel">
+        <section
+          className={`panel transition-opacity ${isLoading ? 'opacity-60' : ''}`}
+          aria-busy={isLoading}
+        >
           <div className="flex flex-col gap-3 border-b border-ink-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">
@@ -523,6 +439,7 @@ const AdminJobsPage = () => {
                           current === job.id ? null : job.id
                         )
                       }
+                      onClose={() => setOpenActionMenuId(null)}
                       onEdit={() => {
                         setEditingJob(job);
                         setOpenActionMenuId(null);
@@ -684,6 +601,7 @@ const AdminJobsPage = () => {
                               current === job.id ? null : job.id
                             )
                           }
+                          onClose={() => setOpenActionMenuId(null)}
                           onEdit={() => {
                             setEditingJob(job);
                             setOpenActionMenuId(null);

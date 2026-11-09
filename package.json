@@ -2,6 +2,7 @@
   "name": "maintenix",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Maintenix - Property Maintenance CRM & Field Service Platform",
   "workspaces": [
     "server",
