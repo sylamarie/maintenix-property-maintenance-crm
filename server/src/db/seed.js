@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 
 import { closePool, query } from '../config/db.js';
 import { getDatabaseErrorMessage } from '../utils/databaseError.js';
+import { getDemoJobDatesByTitle } from './demoJobDates.js';
 
 // Demo accounts need a password. The public one (Password123, listed in the
 // README) is only allowed on a database running on THIS computer. For any
@@ -224,9 +225,7 @@ try {
         'Investigate bathroom leak, isolate the source, repair pipework, and make the affected area safe.',
       status: 'in_progress',
       priority: 'urgent',
-      scheduledDate: '2026-05-02',
-      dueDate: '2026-05-02',
-      completionDate: null,
+      ...getDemoJobDatesByTitle('Bathroom leak repair'),
       assignedOperativeId: operativeUser.id
     },
     {
@@ -237,9 +236,7 @@ try {
         'Replace failed communal hallway light fittings and test the circuit after installation.',
       status: 'assigned',
       priority: 'high',
-      scheduledDate: '2026-05-03',
-      dueDate: '2026-05-05',
-      completionDate: null,
+      ...getDemoJobDatesByTitle('Communal hallway light replacement'),
       assignedOperativeId: operativeUser.id
     },
     {
@@ -250,9 +247,7 @@ try {
         'Repair loose kitchen cabinet door hinges, realign the door, and confirm smooth closing.',
       status: 'assigned',
       priority: 'medium',
-      scheduledDate: '2026-05-06',
-      dueDate: '2026-05-08',
-      completionDate: null,
+      ...getDemoJobDatesByTitle('Kitchen cabinet door repair'),
       assignedOperativeId: operativeUser.id
     },
     {
@@ -263,9 +258,7 @@ try {
         'Inspect reported low boiler pressure, repressurise the system, and confirm heating operation.',
       status: 'completed',
       priority: 'medium',
-      scheduledDate: '2026-04-29',
-      dueDate: '2026-05-01',
-      completionDate: '2026-04-30',
+      ...getDemoJobDatesByTitle('Boiler pressure check'),
       assignedOperativeId: operativeUser.id
     },
     {
@@ -276,9 +269,7 @@ try {
         'Remove damaged rear garden fence panel, fit matching replacement panel, and clear debris from site.',
       status: 'on_hold',
       priority: 'low',
-      scheduledDate: '2026-05-07',
-      dueDate: '2026-05-12',
-      completionDate: null,
+      ...getDemoJobDatesByTitle('Damaged fence panel replacement'),
       assignedOperativeId: operativeUser.id
     }
   ];

@@ -34,8 +34,8 @@ const metricConfig = [
   },
   {
     key: 'dueSoonJobs',
-    label: 'Due soon',
-    helper: 'Due within 7 days',
+    label: 'Due or overdue',
+    helper: 'Due within 7 days, or late',
     icon: Camera,
     tone: 'rose'
   }

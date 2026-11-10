@@ -98,6 +98,8 @@ The login page has three buttons (Admin, Operative, Client). When **demo sign-in
 
 **To reset the demo data** after someone has changed it, run `npm run db:seed` again with `DATABASE_URL` and `DEMO_PASSWORD` set (step 2). It restores the sample records and the demo accounts.
 
+**Demo dates stay current by themselves.** The five demo jobs have dates like "due tomorrow" rather than fixed calendar dates, so the dashboards never fill up with jobs that are months overdue. While `DEMO_LOGIN_ENABLED=true`, the API re-applies those dates when it starts and every 6 hours after that (you will see `Demo mode: refreshed dates on 5 demo job(s).` in the Render logs). It only changes the dates of those five jobs. Statuses, notes, and everything visitors add are left alone. With demo sign-in off, it does nothing. The schedule lives in `server/src/db/demoJobDates.js`.
+
 **Changing the demo password:** run `npm run db:demo-password` in the project folder. It asks for the connection string and the new password (12+ characters) on screen, shows a `*` for each character instead of the text, and changes only the three demo accounts' passwords. Nothing else is touched and nothing is saved to a file. With demo sign-in on, the password only matters if you sign in by typing it.
 
 ## Keep the free API awake (optional)
