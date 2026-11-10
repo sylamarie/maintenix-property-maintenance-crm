@@ -100,9 +100,22 @@ The login page has three buttons (Admin, Operative, Client). When **demo sign-in
 
 **Changing the demo password:** run `npm run db:demo-password` in the project folder. It asks for the connection string and the new password (12+ characters) on screen, shows a `*` for each character instead of the text, and changes only the three demo accounts' passwords. Nothing else is touched and nothing is saved to a file. With demo sign-in on, the password only matters if you sign in by typing it.
 
+## Keep the free API awake (optional)
+
+Render's free plan stops the API after about 15 minutes with no visitors, so the first person to arrive waits close to a minute. An uptime monitor fixes this by visiting the API every few minutes, which counts as activity.
+
+1. Create a free account at [uptimerobot.com](https://uptimerobot.com).
+2. Add a new monitor of type **HTTP(s)**.
+3. For the URL, use your API's **root address**, for example `https://maintenix-api.onrender.com/` (with the slash, and **not** `/api/health`).
+4. Set the check interval to the shortest the free plan allows (it must be under 15 minutes), and save.
+
+**Why the root address and not `/api/health`:** the root address answers without touching the database. `/api/health` queries the database, which would stop Neon from ever going to sleep. Neon's free plan has a monthly allowance of database running time, so keeping it awake all day could use that allowance up.
+
+**Trade-offs:** an always-awake API uses more of Render's free monthly hours (one service fits, but check Render's current free-plan limits before adding more). Photos are still wiped on every redeploy, whether the API sleeps or not.
+
 ## Things to know about the free plans
 
-- **The API sleeps.** After about 15 minutes with no visitors, Render stops the API. The next visit waits about 50 seconds while it wakes up. It is normal. Open the site before showing it to someone.
+- **The API sleeps.** After about 15 minutes with no visitors, Render stops the API. The next visit waits about 50 seconds while it wakes up. It is normal. Open the site before showing it to someone, or use the uptime monitor above.
 - **Photos do not last.** Uploaded photos are saved on Render's disk, which is wiped on every redeploy and restart. For a portfolio demo that is acceptable (the demo data has no photos). To keep photos, the next step would be cloud storage such as Cloudinary or S3.
 - **Neon pauses an idle database** and wakes it automatically on the next request, adding a short delay.
 - **Preview links will not log in.** Vercel creates a different address for every branch. Only the address you put in `CLIENT_URL` is allowed to call the API.

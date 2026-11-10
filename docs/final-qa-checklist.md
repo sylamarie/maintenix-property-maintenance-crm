@@ -11,14 +11,23 @@ Use this checklist before taking screenshots, recording a demo, or sharing the G
 - [ ] `npm run db:test` passes.
 - [ ] `npm run db:schema` completes.
 - [ ] `npm run db:seed` completes.
+- [ ] `npm test` and `npm run lint` pass.
 - [ ] `npm run build` passes.
 - [ ] `npm run dev` starts backend and frontend.
 
 ## Authentication
 
+On a local database:
+
 - [ ] Admin can log in with `admin@maintenix.com / Password123`.
 - [ ] Operative can log in with `operative@maintenix.com / Password123`.
 - [ ] Client can log in with `client@maintenix.com / Password123`.
+
+On the live demo (https://maintenix-xi.vercel.app/login):
+
+- [ ] Clicking **Admin**, **Operative**, and **Client** each signs in as that role with no password.
+- [ ] Typing an email that is not one of the three demo accounts is still refused.
+- [ ] The first request after a quiet period may take up to a minute (free server waking up), then works normally.
 - [ ] Logged-out users are redirected to `/login`.
 - [ ] Users cannot access another role's dashboard.
 - [ ] Logout clears the session and redirects to login.
