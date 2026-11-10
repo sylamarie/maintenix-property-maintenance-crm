@@ -1,0 +1,28 @@
+# Render "Blueprint": tells Render how to build and run the Maintenix API.
+# Step-by-step instructions: docs/deployment.md
+services:
+  - type: web
+    name: maintenix-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci
+    startCommand: npm start
+    # Render calls this to check the API is alive. It returns 503 if the
+    # database is down, so Render will not send traffic to a broken API.
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22
+      # Render generates a long random secret for you. You never see or copy it.
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_CONNECTION_TIMEOUT_MS
+        value: 10000
+      # You paste these two in the Render dashboard (never commit them):
+      - key: DATABASE_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false

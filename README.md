@@ -76,6 +76,8 @@ Add screenshots to your portfolio or GitHub README after running the app:
 
 ## Demo Accounts
 
+These are the accounts created by `npm run db:seed` on a **local** database. The password below only works locally: seeding a hosted database requires you to choose your own password (see [docs/deployment.md](docs/deployment.md)).
+
 ```txt
 Admin
 Email:    admin@maintenix.com
@@ -295,6 +297,8 @@ Maintenix uses a print-friendly report page for the MVP. The `Print / Save as PD
 A future production version could add server-side PDF generation for archived reports and email attachments.
 
 ## Deployment Preparation
+
+Step-by-step hosting guide (Render + Neon + Vercel): [docs/deployment.md](docs/deployment.md). The overview below is for reference.
 
 Recommended deployment plan:
 
