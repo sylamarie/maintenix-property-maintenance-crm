@@ -21,6 +21,10 @@ The project focuses on real business workflows rather than a simple marketing si
 - Client portal with linked properties, jobs, photos, variations, and reports
 - Shared job report page with browser Print / Save as PDF support
 - Role-based access control across backend APIs and frontend routes
+- Paginated, searchable lists backed by database indexes
+- Hardened API: login rate limiting, strict upload checks, no internal error details in responses
+- 64 automated tests plus linting and a production build, run by GitHub Actions on every pull request
+- Live deployment on Vercel (frontend), Render (API), and Neon (PostgreSQL), with one-click demo sign-in
 
 ## Tech Stack
 
@@ -33,6 +37,9 @@ The project focuses on real business workflows rather than a simple marketing si
 - JWT
 - bcrypt
 - REST APIs
+- Vitest, Supertest, and React Testing Library
+- ESLint, Prettier, and GitHub Actions
+- Vercel, Render, and Neon
 - Local file uploads for MVP photo storage
 
 ## My Role

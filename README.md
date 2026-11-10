@@ -1,8 +1,59 @@
 # Maintenix
 
+[![CI](https://github.com/sylamarie/maintenix-property-maintenance-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/sylamarie/maintenix-property-maintenance-crm/actions/workflows/ci.yml)
+
 Maintenix is a full-stack property maintenance CRM and field service platform built as a portfolio project. It models the internal system a UK property maintenance company would use to manage clients, properties, work orders, field operatives, client approvals, variations, photos, and job reports.
 
-The goal of this project is to demonstrate production-style full-stack application work: role-based authentication, relational data modelling, REST APIs, admin CRUD workflows, operative field workflows, client portal access, local uploads, and print-ready reporting.
+**Live demo: [maintenix-xi.vercel.app](https://maintenix-xi.vercel.app/login)**
+
+## Try It In 10 Seconds
+
+1. Open the [live demo](https://maintenix-xi.vercel.app/login).
+2. Click **Admin**, **Operative**, or **Client**. There is no password to type; you are signed in straight away.
+3. Look around, then sign out and try another role. The three roles see very different things.
+
+Good to know:
+
+- The API runs on a free hosting plan that sleeps when nobody is using it. If the first sign-in takes up to a minute, that is the server waking up. After that it is fast.
+- The demo data is shared and you can change it. If it looks odd, someone has been testing.
+- Photo uploads work, but files on the free plan are cleared whenever the API redeploys.
+
+## Screenshots
+
+**Admin dashboard**: workload, overdue alerts, and recent jobs across every client.
+
+![Admin dashboard showing job status breakdown, overdue alerts and recent jobs](docs/screenshots/admin-dashboard.png)
+
+**Operative dashboard**: what a field worker sees on their phone or tablet: only their own assigned jobs.
+
+![Operative dashboard listing assigned jobs with status, priority and due dates](docs/screenshots/operative-dashboard.png)
+
+**Client portal**: read-only job tracking, plus approving or rejecting priced variations.
+
+![Client portal showing properties, active jobs and variations awaiting approval](docs/screenshots/client-portal.png)
+
+## What This Project Shows
+
+The goal is to demonstrate production-style full-stack work, not just screens that look right:
+
+- **Real business rules.** Three roles with different data ownership. An operative can only open jobs assigned to them, and a client can only see their own properties.
+- **A workflow that crosses roles.** An operative raises a variation, an admin prices it, and the client approves or rejects it.
+- **Security basics done properly.** Passwords are hashed with bcrypt, and the server refuses to start with a weak signing secret. Failed logins are rate limited, errors never leak stack traces, and uploads are checked by file signature rather than trusting the file name.
+- **Built to stay correct.** 64 automated tests (Vitest, Supertest, Testing Library) run in GitHub Actions on every pull request, together with linting and a production build.
+- **Scales past the demo data.** Paginated lists, debounced search, and database indexes for the search queries.
+- **Accessible UI.** Dialogs trap keyboard focus and close with Escape, and routes load on demand.
+- **Actually deployed.** The frontend, API, and database run on three separate free services (see below).
+
+## How It Is Built
+
+```mermaid
+flowchart LR
+  Browser["Browser"] --> Vercel["Frontend<br/>React + Vite<br/>(Vercel)"]
+  Vercel -->|"REST API + JWT"| Render["API<br/>Node + Express<br/>(Render)"]
+  Render --> Neon[("PostgreSQL<br/>(Neon)")]
+```
+
+The repository is an npm workspaces monorepo: `client/` is the React app and `server/` is the Express API. The API follows a routes, controllers, models, middleware layout. Step-by-step hosting instructions are in [docs/deployment.md](docs/deployment.md).
 
 ## Why I Built It
 
@@ -27,7 +78,8 @@ Simple portfolio websites do not show how a developer handles real business logi
 - Variation workflow: operative raises, admin prices, client approves or rejects
 - Client portal for properties, jobs, variations, photos, and read-only job details
 - Shared job report page for all roles with browser print / Save as PDF support
-- Search, filtering, loading states, empty states, validation, errors, and confirmations
+- Search, filtering, pagination, loading states, empty states, validation, errors, and confirmations
+- One-click demo sign-in for the three demo accounts (switched on only for the live demo)
 - Responsive React/Tailwind interface with reusable UI components
 
 ## User Roles
@@ -58,25 +110,15 @@ Client:
 - Uploads: local Express static file storage for MVP photos
 - API style: REST
 - Reports: browser print / Save as PDF
-
-## Screenshots
-
-Add screenshots to your portfolio or GitHub README after running the app:
-
-- Login page
-- Admin dashboard
-- Clients CRM page
-- Jobs management page
-- Operative job detail with notes and uploaded photos
-- Variation workflow screens
-- Client portal dashboard
-- Client job detail
-- Job report page
-- Print / Save as PDF preview
+- Testing: Vitest, Supertest, React Testing Library
+- Quality checks: ESLint, Prettier, GitHub Actions CI
+- Hosting: Vercel (frontend), Render (API), Neon (PostgreSQL)
 
 ## Demo Accounts
 
-These are the accounts created by `npm run db:seed` on a **local** database. The password below only works locally: seeding a hosted database requires you to choose your own password (see [docs/deployment.md](docs/deployment.md)).
+**On the live demo** you do not need a password: click a role on the login page. That works because the live API has `DEMO_LOGIN_ENABLED=true`, which turns on a sign-in route that accepts only these three demo emails. It is off by default, and it never works for any other account.
+
+**On your own computer**, these accounts are created by `npm run db:seed`. The password below only works against a local database; seeding a hosted database requires you to choose your own password (see [docs/deployment.md](docs/deployment.md)).
 
 ```txt
 Admin
@@ -123,10 +165,19 @@ PORT=5000
 CLIENT_URL=http://localhost:5173,http://127.0.0.1:5173
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/maintenix
 DATABASE_CONNECTION_TIMEOUT_MS=5000
-JWT_SECRET=replace_this_with_a_long_random_secret
+JWT_SECRET=<a random value of at least 32 characters, see below>
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=uploads
+DEMO_LOGIN_ENABLED=false
 ```
+
+`JWT_SECRET` signs every login token, so the API refuses to start if it is missing or short. Generate one and paste it into `server/.env`:
+
+```powershell
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+Never commit `server/.env`; it is already in `.gitignore`.
 
 Frontend `client/.env`:
 
@@ -185,11 +236,15 @@ Backend:  http://localhost:5000
 Health:   http://localhost:5000/api/health
 ```
 
-## Build
+## Test, Lint, And Build
 
 ```powershell
-npm run build
+npm test        # server and client tests (64 in total)
+npm run lint    # ESLint
+npm run build   # production build of the frontend
 ```
+
+The same three checks run automatically in GitHub Actions on every push to `main` and on every pull request. The server tests mock the database, so you do not need PostgreSQL running to run them.
 
 ## Main Workflow To Test
 
@@ -212,23 +267,30 @@ maintenix/
       api/            REST API clients
       auth/           auth context and route guards
       components/     shared UI, sidebar, topbar
+      hooks/          reusable React hooks
       layouts/        app/auth layouts
       pages/          admin, operative, client, shared pages
       utils/          constants and formatters
+    vercel.json       makes deep links such as /admin/jobs work on Vercel
   server/
     src/
+      __tests__/      API tests (Vitest + Supertest, database mocked)
       config/         env and PostgreSQL pool
       controllers/    request handlers
-      db/             schema and seed scripts
+      db/             schema, seed, and demo-password scripts
       middleware/     auth, roles, errors, uploads
       models/         PostgreSQL query modules
       routes/         Express routers
       services/       auth service
-      utils/          validation and error helpers
+      utils/          validation, pagination, and error helpers
     uploads/          local uploaded files in development
   docs/
+    screenshots/      images used in this README
+    deployment.md     step-by-step hosting guide
     portfolio-description.md
     final-qa-checklist.md
+  .github/workflows/  CI: lint, test, build
+  render.yaml         Render blueprint for the API
 ```
 
 ## API Overview
@@ -237,8 +299,11 @@ Authentication:
 
 ```txt
 POST /api/auth/login
+POST /api/auth/demo-login     (only when DEMO_LOGIN_ENABLED=true, demo emails only)
 GET  /api/auth/me
 ```
+
+Pagination: list endpoints for jobs, clients, and properties accept `?page=1&limit=10` (limit is capped at 100) and `?search=`. When `page` or `limit` is sent, the response also includes `pagination: { page, limit, total, totalPages }`.
 
 Admin:
 
@@ -318,9 +383,12 @@ DATABASE_CONNECTION_TIMEOUT_MS=10000
 JWT_SECRET=<long-random-production-secret>
 JWT_EXPIRES_IN=7d
 UPLOAD_DIR=uploads
+DEMO_LOGIN_ENABLED=false
 VITE_API_URL=https://your-api-domain.com/api
 VITE_APP_NAME=Maintenix
 ```
+
+Keep `DEMO_LOGIN_ENABLED=false` on any deployment that holds real data. Set it to `true` only on a public portfolio demo, where anyone can sign in as the three demo accounts.
 
 CORS note:
 
@@ -352,5 +420,6 @@ See [docs/final-qa-checklist.md](docs/final-qa-checklist.md) for the final test 
 - Schedule calendar drag-and-drop
 - Audit log for status and variation changes
 - Password reset and user invite flow
-- More automated backend and frontend tests
-- Deployment CI/CD pipeline
+- Pagination on the clients and properties pages (the API already supports it)
+- Stricter job status rules, so a job cannot jump between any two statuses
+- Browser-level end-to-end tests (for example Playwright)
