@@ -63,6 +63,17 @@ export const AuthProvider = ({ children }) => {
     return response.data.user;
   }, []);
 
+  // One-click demo sign-in: the server decides if it is allowed (it is OFF
+  // unless the server's DEMO_LOGIN_ENABLED is true). No password is sent.
+  const demoLogin = useCallback(async (email) => {
+    const response = await apiClient.post('/auth/demo-login', { email });
+
+    setStoredToken(response.data.token);
+    setUser(response.data.user);
+
+    return response.data.user;
+  }, []);
+
   const logout = useCallback(() => {
     clearStoredToken();
     setUser(null);
@@ -74,9 +85,10 @@ export const AuthProvider = ({ children }) => {
       isLoading,
       isAuthenticated: Boolean(user),
       login,
+      demoLogin,
       logout
     }),
-    [isLoading, user, login, logout]
+    [isLoading, user, login, demoLogin, logout]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

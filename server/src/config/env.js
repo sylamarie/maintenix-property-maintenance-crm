@@ -47,5 +47,8 @@ export const env = {
     Number(process.env.DATABASE_CONNECTION_TIMEOUT_MS) || 5000,
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  // One-click demo sign-in (see authService.loginAsDemoUser). OFF unless the
+  // environment variable DEMO_LOGIN_ENABLED is exactly 'true'.
+  demoLoginEnabled: process.env.DEMO_LOGIN_ENABLED === 'true',
   uploadDir: process.env.UPLOAD_DIR || 'uploads'
 };

@@ -38,7 +38,7 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isLoginRequest = error.config?.url?.includes('/auth/login');
+    const isLoginRequest = /\/auth\/(demo-)?login/.test(error.config?.url || '');
 
     // 401 on any request except a wrong-password login means our saved login
     // pass is no longer valid (expired, or the account was deactivated).

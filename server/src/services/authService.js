@@ -47,3 +47,38 @@ export const loginWithPassword = async ({ email, password }) => {
     user: toPublicUser(user)
   };
 };
+
+// The only accounts that can use one-click demo sign-in.
+export const demoAccountEmails = [
+  'admin@maintenix.com',
+  'operative@maintenix.com',
+  'client@maintenix.com'
+];
+
+// Signs a visitor in as one of the three demo accounts WITHOUT a password, so a
+// portfolio visitor can click a role and explore. Safe-guards:
+//  - off unless DEMO_LOGIN_ENABLED=true (set it only on a demo deployment)
+//  - only the three emails above, never a real user
+//  - the account must exist and be active
+export const loginAsDemoUser = async ({ email }) => {
+  if (!env.demoLoginEnabled) {
+    throw new ApiError(403, 'Demo sign-in is not enabled.');
+  }
+
+  const normalisedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+  if (!demoAccountEmails.includes(normalisedEmail)) {
+    throw new ApiError(403, 'That account is not available for demo sign-in.');
+  }
+
+  const user = await findUserByEmail(normalisedEmail);
+
+  if (!user || !user.is_active) {
+    throw new ApiError(401, 'Demo account is not available.');
+  }
+
+  return {
+    token: generateToken(user),
+    user: toPublicUser(user)
+  };
+};
