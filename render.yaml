@@ -19,6 +19,10 @@ services:
       # Render generates a long random secret for you. You never see or copy it.
       - key: JWT_SECRET
         generateValue: true
+      # Lets visitors click a demo role and sign in with no password.
+      # Anyone can then use the demo accounts. Set to false to turn it off.
+      - key: DEMO_LOGIN_ENABLED
+        value: true
       - key: DATABASE_CONNECTION_TIMEOUT_MS
         value: 10000
       # You paste these two in the Render dashboard (never commit them):

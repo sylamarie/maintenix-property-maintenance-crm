@@ -86,6 +86,20 @@ If your Vercel project builds from the repository root instead of the `client` f
 
 Open your Vercel website, sign in as `admin@maintenix.com` with your `DEMO_PASSWORD`, and click through the jobs page.
 
+## One-click demo sign-in (optional)
+
+The login page has three buttons (Admin, Operative, Client). When **demo sign-in** is on, clicking a button signs the visitor straight in, with no password. This is how employers can look around without asking you for a password.
+
+**To switch it on:** in Render open **maintenix-api > Environment**, add a variable named `DEMO_LOGIN_ENABLED` with the value `true`, and save. Render restarts the API. (Services created from `render.yaml` get it automatically.)
+
+**To switch it off:** change the value to `false` (or delete the variable). The buttons then fill in the email only and visitors must type a password.
+
+**What it means:** anyone who opens your site can click a role and use the app as that role, including the admin, and can change or delete the demo data. Only the three demo accounts can be used this way. Real accounts always need a password, and the feature is off unless you turn it on.
+
+**To reset the demo data** after someone has changed it, run `npm run db:seed` again with `DATABASE_URL` and `DEMO_PASSWORD` set (step 2). It restores the sample records and the demo accounts.
+
+**Changing the demo password:** run `npm run db:demo-password` in the project folder. It asks for the connection string and the new password (12+ characters) on screen, shows a `*` for each character instead of the text, and changes only the three demo accounts' passwords. Nothing else is touched and nothing is saved to a file. With demo sign-in on, the password only matters if you sign in by typing it.
+
 ## Things to know about the free plans
 
 - **The API sleeps.** After about 15 minutes with no visitors, Render stops the API. The next visit waits about 50 seconds while it wakes up. It is normal. Open the site before showing it to someone.

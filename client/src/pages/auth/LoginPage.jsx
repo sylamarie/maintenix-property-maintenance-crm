@@ -1,30 +1,36 @@
 import { ArrowRight, Loader2, LockKeyhole } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../auth/AuthContext.jsx';
 import { getDashboardPathForRole } from '../../auth/roleRoutes.js';
 
 const demoAccounts = [
-  { role: 'Admin', email: 'admin@maintenix.com', password: 'Password123' },
-  {
-    role: 'Operative',
-    email: 'operative@maintenix.com',
-    password: 'Password123'
-  },
-  { role: 'Client', email: 'client@maintenix.com', password: 'Password123' }
+  { role: 'Admin', email: 'admin@maintenix.com' },
+  { role: 'Operative', email: 'operative@maintenix.com' },
+  { role: 'Client', email: 'client@maintenix.com' }
 ];
+
+// On your own computer (`npm run dev`) the demo accounts use the public
+// password from the README, so the buttons fill it in. On the live website the
+// demo password is private and is NOT in this code: `import.meta.env.DEV` is
+// replaced by `false` when the site is built, so this string is removed from
+// the published JavaScript.
+const getLocalDemoPassword = () => (import.meta.env.DEV ? 'Password123' : '');
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, isLoading, login, user } = useAuth();
+  const { isAuthenticated, isLoading, login, demoLogin, user } = useAuth();
+  const passwordInputRef = useRef(null);
   const [formData, setFormData] = useState({
     email: 'admin@maintenix.com',
-    password: 'Password123'
+    password: getLocalDemoPassword()
   });
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Becomes true if the server says one-click demo sign-in is switched off.
+  const [isDemoSignInOff, setIsDemoSignInOff] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -63,11 +69,46 @@ const LoginPage = () => {
   };
 
   const fillDemoAccount = (account) => {
+    const localPassword = getLocalDemoPassword();
+
     setFormData({
       email: account.email,
-      password: account.password
+      password: localPassword
     });
     setError('');
+
+    // Live site: no password is filled in, so put the cursor where it is typed.
+    if (!localPassword) {
+      passwordInputRef.current?.focus();
+    }
+  };
+
+  // Clicking a role signs in straight away (no password to type).
+  const handleDemoLogin = async (account) => {
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const loggedInUser = await demoLogin(account.email);
+      const fromPath = location.state?.from?.pathname;
+
+      navigate(fromPath || getDashboardPathForRole(loggedInUser.role), { replace: true });
+    } catch (requestError) {
+      const status = requestError.response?.status;
+
+      if (status === 403 || status === 404) {
+        // This server has demo sign-in switched off: fall back to filling the form.
+        setIsDemoSignInOff(true);
+        fillDemoAccount(account);
+      } else {
+        setError(
+          requestError.response?.data?.message ||
+            'Unable to sign in right now. Please try again.'
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -80,7 +121,7 @@ const LoginPage = () => {
           Sign in to Maintenix
         </h1>
         <p className="mt-2 text-sm text-ink-500">
-          Use one of the demo accounts to access a role-specific workspace.
+          Pick a demo role below to explore its workspace, or sign in with your own account.
         </p>
       </div>
 
@@ -111,9 +152,10 @@ const LoginPage = () => {
               id="password"
               name="password"
               type="password"
+              ref={passwordInputRef}
               value={formData.password}
               onChange={handleChange}
-              placeholder="Password123"
+              placeholder={import.meta.env.DEV ? 'Password123' : 'Demo password'}
               autoComplete="current-password"
               required
             />
@@ -150,13 +192,25 @@ const LoginPage = () => {
           <button
             type="button"
             key={account.email}
-            onClick={() => fillDemoAccount(account)}
-            className="flex items-center justify-between rounded-lg border border-ink-100 bg-white px-4 py-3 text-left text-sm transition hover:border-brand-500 hover:bg-brand-50"
+            onClick={() => handleDemoLogin(account)}
+            disabled={isSubmitting || isLoading}
+            className="flex items-center justify-between rounded-lg border border-ink-100 bg-white px-4 py-3 text-left text-sm transition hover:border-brand-500 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span className="font-medium text-ink-900">{account.role}</span>
             <span className="text-ink-500">{account.email}</span>
           </button>
         ))}
+        {isDemoSignInOff ? (
+          import.meta.env.DEV ? null : (
+            <p className="text-center text-xs text-ink-500">
+              Demo sign-in is switched off here. Enter the demo password you were given.
+            </p>
+          )
+        ) : (
+          <p className="text-center text-xs text-ink-500">
+            Click a role to sign in instantly.
+          </p>
+        )}
       </div>
     </div>
   );

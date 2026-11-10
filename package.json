@@ -19,7 +19,8 @@
     "build": "npm run build --workspace client",
     "lint": "eslint .",
     "test": "npm run test --workspaces --if-present",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "db:demo-password": "npm run db:demo-password --workspace server"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",

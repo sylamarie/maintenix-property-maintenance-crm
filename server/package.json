@@ -11,7 +11,8 @@
     "db:schema": "node src/db/runSchema.js",
     "db:seed": "node src/db/seed.js",
     "db:test": "node src/db/testConnection.js",
-    "test": "vitest run"
+    "test": "vitest run",
+    "db:demo-password": "node src/db/setDemoPassword.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
