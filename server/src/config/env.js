@@ -21,11 +21,24 @@ const knownWeakSecrets = [
   'development_secret_change_me',
   'change_me',
   'secret',
-  'your_jwt_secret_here'
+  'your_jwt_secret_here',
+  // The value server/.env.example used to ship with. It is long enough to pass
+  // the length check, so it has to be refused by name.
+  'replace_this_with_a_long_random_secret'
 ];
 
+// Catches other placeholder-style values someone might leave in by mistake,
+// such as "replace_this_with_something_random". A real random secret (hex or
+// base64) will not contain these words by accident.
+const placeholderPattern = /replace|change[_-]?me|placeholder|your[_-]?(jwt[_-]?)?secret/i;
+
 export const assertJwtSecret = (secret = process.env.JWT_SECRET) => {
-  if (!secret || secret.length < 32 || knownWeakSecrets.includes(secret)) {
+  if (
+    !secret ||
+    secret.length < 32 ||
+    knownWeakSecrets.includes(secret) ||
+    placeholderPattern.test(secret)
+  ) {
     throw new Error(
       'JWT_SECRET must be set to a random value of at least 32 characters. ' +
         `Generate one with: node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"`
