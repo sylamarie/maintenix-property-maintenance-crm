@@ -114,9 +114,9 @@ const JobReportPage = () => {
               <p className="text-sm font-semibold uppercase tracking-wide text-brand-700">
                 Maintenix job report
               </p>
-              <h1 className="mt-2 text-2xl font-semibold text-ink-900">
+              <h2 className="mt-2 text-2xl font-semibold text-ink-900">
                 {job.title}
-              </h1>
+              </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-ink-600">
                 {job.description}
               </p>
@@ -244,7 +244,7 @@ const JobReportPage = () => {
                             <p className="mt-2 text-sm text-ink-700">
                               {photo.caption || 'No caption'}
                             </p>
-                            <p className="mt-1 text-xs text-ink-400">
+                            <p className="mt-1 text-xs text-ink-500">
                               {formatDateTime(photo.createdAt)}
                             </p>
                           </div>

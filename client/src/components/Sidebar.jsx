@@ -135,7 +135,7 @@ const Sidebar = ({ isCollapsed = false, isOpen, onClose }) => {
         <nav className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
           {visibleGroups.map((group) => (
             <div key={group.label} className="mb-7">
-              <p className={`px-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/35 ${
+              <p className={`px-3 text-xs font-semibold uppercase tracking-[0.18em] text-white/60 ${
                 isCollapsed ? 'lg:text-center lg:text-[0]' : ''
               }`}>
                 {group.label}

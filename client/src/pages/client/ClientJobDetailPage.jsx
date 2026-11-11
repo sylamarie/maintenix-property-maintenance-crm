@@ -198,7 +198,7 @@ const ClientJobDetailPage = () => {
                             <p className="mt-2 text-sm text-ink-600">
                               {photo.caption || 'No caption'}
                             </p>
-                            <p className="mt-1 text-xs text-ink-400">
+                            <p className="mt-1 text-xs text-ink-500">
                               {formatDateTime(photo.createdAt)}
                             </p>
                           </div>
@@ -237,7 +237,7 @@ const ClientJobDetailPage = () => {
                     <p className="mt-2 whitespace-pre-line text-sm text-ink-700">
                       {note.note}
                     </p>
-                    <p className="mt-2 text-xs text-ink-400">
+                    <p className="mt-2 text-xs text-ink-500">
                       {formatDateTime(note.createdAt)}
                     </p>
                   </article>

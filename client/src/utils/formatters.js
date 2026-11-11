@@ -1,5 +1,20 @@
-export const formatDate = (value) => {
-  if (!value) return 'Not scheduled';
+// A short, readable job code such as "JOB-17B06486". Job ids are long UUIDs,
+// so only the first 8 characters are shown. The full id is still what the
+// app uses behind the scenes (links, API calls).
+export const formatJobCode = (id) => {
+  const text = String(id ?? '').replace(/-/g, '');
+
+  return `JOB-${text.slice(0, 8).toUpperCase()}`;
+};
+
+// "1 property", "3 properties". Pass the plural when it is not just "+s".
+export const pluralize = (count, singular, plural = `${singular}s`) =>
+  `${count} ${Number(count) === 1 ? singular : plural}`;
+
+// `fallback` is what to show when there is no date. The default suits every
+// labelled field ("Due: Not set", "Completed: Not set").
+export const formatDate = (value, fallback = 'Not set') => {
+  if (!value) return fallback;
 
   return new Intl.DateTimeFormat('en-GB', {
     day: '2-digit',

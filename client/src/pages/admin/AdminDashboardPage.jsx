@@ -20,9 +20,7 @@ import EmptyState from '../../components/ui/EmptyState.jsx';
 import PriorityBadge from '../../components/ui/PriorityBadge.jsx';
 import StatusBadge from '../../components/ui/StatusBadge.jsx';
 import { jobStatuses } from '../../utils/constants.js';
-import { formatDate } from '../../utils/formatters.js';
-
-const getJobCode = (id) => `JOB-${String(id).padStart(4, '0')}`;
+import { formatDate, formatJobCode } from '../../utils/formatters.js';
 
 const getDateValue = (value) => {
   if (!value) return null;
@@ -80,7 +78,7 @@ const CompactJobCard = ({ job }) => (
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <p className="text-xs font-semibold text-brand-600">
-          {getJobCode(job.id)}
+          {formatJobCode(job.id)}
         </p>
         <p className="mt-1 truncate text-sm font-semibold text-ink-900">
           {job.title}
@@ -264,7 +262,7 @@ const AdminDashboardPage = () => {
               </span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-brand-100 bg-brand-50 px-4 py-3">
-              <span className="text-sm font-semibold text-brand-800">
+              <span className="text-sm font-semibold text-brand-700">
                 Upcoming due dates
               </span>
               <span className="text-lg font-semibold text-brand-700">
