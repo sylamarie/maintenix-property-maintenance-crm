@@ -39,7 +39,7 @@ a {
   }
 
   .input {
-    @apply h-11 w-full rounded-lg border border-ink-100 bg-white px-3 py-2 text-sm text-ink-900 shadow-sm outline-none transition placeholder:text-ink-400 hover:border-ink-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400;
+    @apply h-11 w-full rounded-lg border border-ink-100 bg-white px-3 py-2 text-base text-ink-900 shadow-sm sm:text-sm outline-none transition placeholder:text-ink-400 hover:border-ink-300 focus:border-brand-500 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400;
   }
 
   .label {
@@ -117,6 +117,23 @@ a {
   }
 }
 
+/* People who ask their device for less motion (a system setting) get no
+   animations or smooth scrolling. Spinners and pulses stop too. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@page {
+  margin: 14mm;
+}
+
 @media print {
   :root,
   body {
@@ -152,10 +169,10 @@ a {
     content: "";
   }
 
+  /* Keep a photo (and its caption) in one piece, but let long sections flow
+     across pages. Forcing whole sections to stay together left big blank gaps. */
   img,
-  figure,
-  article,
-  section {
+  figure {
     break-inside: avoid;
   }
 }

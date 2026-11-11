@@ -12,6 +12,7 @@ import FormInput from '../../components/ui/FormInput.jsx';
 import PageHeader from '../../components/ui/PageHeader.jsx';
 import SearchInput from '../../components/ui/SearchInput.jsx';
 import Textarea from '../../components/ui/Textarea.jsx';
+import { pluralize } from '../../utils/formatters.js';
 
 const blankForm = {
   name: '',
@@ -146,7 +147,8 @@ const AdminClientsPage = () => {
       header: 'Portfolio',
       render: (client) => (
         <p className="text-ink-700">
-          {client.propertyCount} properties / {client.jobCount} jobs
+          {pluralize(client.propertyCount, 'property', 'properties')} /{' '}
+          {pluralize(client.jobCount, 'job')}
         </p>
       )
     },

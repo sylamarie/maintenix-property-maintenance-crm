@@ -159,7 +159,7 @@ const ClientDashboardPage = () => {
                             {variation.job.title} /{' '}
                             {variation.job.propertyName}
                           </p>
-                          <p className="mt-1 text-xs text-ink-400">
+                          <p className="mt-1 text-xs text-ink-500">
                             {formatDateTime(variation.createdAt)}
                           </p>
                         </div>

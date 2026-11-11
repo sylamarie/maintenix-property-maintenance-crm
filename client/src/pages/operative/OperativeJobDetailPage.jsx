@@ -59,7 +59,7 @@ const PhotoCard = ({ photo, label }) => {
       <figcaption className="space-y-3 p-4 text-sm">
         <p className="min-h-5 text-ink-700">{photo.caption || 'No caption'}</p>
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-ink-100 pt-3">
-          <p className="text-xs text-ink-400">{formatDateTime(createdAt)}</p>
+          <p className="text-xs text-ink-500">{formatDateTime(createdAt)}</p>
           {imageUrl ? (
             <a
               href={imageUrl}
@@ -758,7 +758,7 @@ const OperativeJobDetailPage = () => {
                     <p className="mt-2 whitespace-pre-line text-sm text-ink-700">
                       {item.note}
                     </p>
-                    <p className="mt-2 text-xs text-ink-400">
+                    <p className="mt-2 text-xs text-ink-500">
                       {formatDateTime(item.createdAt)}
                     </p>
                   </article>

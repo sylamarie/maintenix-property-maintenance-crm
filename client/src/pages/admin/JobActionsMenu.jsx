@@ -99,7 +99,7 @@ const JobActionsMenu = ({
           <label className="grid gap-1 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-500">
             Status
             <select
-              className="h-9 rounded-lg border border-ink-100 bg-white px-2 text-sm font-medium normal-case tracking-normal text-ink-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              className="h-9 rounded-lg border border-ink-100 bg-white px-2 text-base font-medium normal-case sm:text-sm tracking-normal text-ink-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               value={job.status}
               onChange={(event) => onStatusChange(job, event.target.value)}
             >
@@ -113,7 +113,7 @@ const JobActionsMenu = ({
           <label className="grid gap-1 px-3 py-2 text-xs font-semibold uppercase tracking-wide text-ink-500">
             Assignee
             <select
-              className="h-9 rounded-lg border border-ink-100 bg-white px-2 text-sm font-medium normal-case tracking-normal text-ink-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+              className="h-9 rounded-lg border border-ink-100 bg-white px-2 text-base font-medium normal-case sm:text-sm tracking-normal text-ink-700 outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               value={job.assignedOperativeId || ''}
               onChange={(event) =>
                 onAssignmentChange(job, event.target.value)
